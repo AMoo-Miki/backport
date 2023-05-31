@@ -37,6 +37,9 @@ const run = async () => {
     const filesInput = getInput("files_to_skip");
     const filesToSkip = getFilesToSkip(filesInput);
 
+    const failureLabelsInput = getInput("failure_labels");
+    const failureLabels = getFilesToSkip(failureLabelsInput);
+
     if (!context.payload.pull_request) {
       throw new Error(`Unsupported event action: ${context.payload.action}.`);
     }
@@ -56,6 +59,7 @@ const run = async () => {
       getLabels,
       getTitle,
       labelRegExp,
+      failureLabels,
       payload,
       token,
     });
