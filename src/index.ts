@@ -3,8 +3,8 @@ import { context } from "@actions/github";
 import type { PullRequestEvent } from "@octokit/webhooks-types";
 import ensureError from "ensure-error";
 import { template } from "lodash-es";
-import { backport } from "./backport.js";
-import { getFilesToSkip } from "./get-files-to-skip.js";
+import { backport } from "./backport";
+import { parseCommaDelimitedStrings } from "./utils";
 
 const run = async () => {
   try {
@@ -34,8 +34,12 @@ const run = async () => {
     const labelRegExp = new RegExp(labelPattern);
 
     const token = getInput("github_token", { required: true });
+
     const filesInput = getInput("files_to_skip");
-    const filesToSkip = getFilesToSkip(filesInput);
+    const filesToSkip = parseCommaDelimitedStrings(filesInput);
+
+    const failureLabelsInput = getInput("failure_labels");
+    const failureLabels = parseCommaDelimitedStrings(failureLabelsInput);
 
     if (!context.payload.pull_request) {
       throw new Error(`Unsupported event action: ${context.payload.action}.`);
@@ -56,6 +60,7 @@ const run = async () => {
       getLabels,
       getTitle,
       labelRegExp,
+      failureLabels,
       payload,
       token,
     });

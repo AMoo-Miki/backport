@@ -199,6 +199,7 @@ const backport = async ({
   getLabels,
   getTitle,
   labelRegExp,
+  failureLabels,
   payload,
   token,
 }: {
@@ -231,6 +232,7 @@ const backport = async ({
     }>,
   ) => string;
   labelRegExp: RegExp;
+  failureLabels: string[];
   payload: PullRequestClosedEvent | PullRequestLabeledEvent;
   token: string;
 }): Promise<{ [base: string]: number }> => {
@@ -335,6 +337,18 @@ const backport = async ({
             repo,
           },
         );
+
+        if (failureLabels.length > 0) {
+          await github.request(
+            "POST /repos/{owner}/{repo}/issues/{issue_number}/labels",
+            {
+              issue_number: number,
+              labels: failureLabels,
+              owner,
+              repo,
+            },
+          );
+        }
       }
     });
   }
